@@ -1,0 +1,53 @@
+public class TravelingSalesmanProblem {
+    // Number of cities in the tour
+    private static final int N = 4;
+    // Initial city
+    private static final int START = 0;
+    // No path
+    private static final int NO_PATH = -1;
+    // Infinity
+    private static final int INF = Integer.MAX_VALUE;
+
+    // Adjacency matrix for the graph
+    private static int[][] distance = {
+        { 0, 10, 15, 20 },
+        { 10, 0, 35, 25 },
+        { 15, 35, 0, 30 },
+        { 20, 25, 30, 0 }
+    };
+
+    private static int[][] dp = new int[N][1 << N];
+
+    public static void main(String[] args) {
+        for(int i = 0; i < N; i++) {
+            Arrays.fill(dp[i], NO_PATH);
+        }
+
+        // The answer will be in dp[START][1 << START]
+        int minTourCost = tsp(START, 1 << START);
+
+        System.out.println("Minimum tour cost: " + minTourCost);
+    }
+
+    private static int tsp(int i, int mask) {
+        // Completed the tour and returning to the start city
+        if(mask == (1 << N) - 1) {
+            return distance[i][START] != 0 ? distance[i][START] : INF;
+        }
+        // Already computed this subproblem
+        if(dp[i][mask] != NO_PATH) {
+            return dp[i][mask];
+        }
+
+        int minCost = INF;
+
+        for(int j = 0; j < N; j++) {
+            // Move to the next unvisited city
+            if((mask & (1 << j)) == 0 && distance[i][j] != 0) {
+                minCost = Math.min(minCost, distance[i][j] + tsp(j, mask | (1 << j)));
+            }
+        }
+
+        return dp[i][mask] = minCost;
+    }
+}
